@@ -24,6 +24,38 @@
       position: relative;
     }
 
+    .zelda-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 5;
+    }
+
+    .zelda-container img {
+      width: 300px;
+      max-width: 80vw;
+      cursor: pointer;
+    }
+
+    .zelda-text {
+      font-size: 1.6rem;
+      color: #4d4d4d;
+      margin-bottom: 1rem;
+      text-align: center;
+      animation: floatBlink 1.8s infinite;
+      z-index: 10;
+      max-width: 90vw;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .emoji-line {
+      display: block;
+      margin-top: 0.4rem;
+    }
+
     .dog {
       position: absolute;
       bottom: 5vh;
@@ -34,6 +66,7 @@
       transform: translateX(-100%);
       animation: moveDog 3s ease-out forwards;
       z-index: 1;
+      display: none;
     }
 
     .gift {
@@ -47,6 +80,7 @@
       animation: moveGift 3s ease-out forwards;
       z-index: 2;
       transition: transform 0.3s;
+      display: none;
     }
 
     .gift:hover {
@@ -63,6 +97,7 @@
       animation: blink 1.2s infinite;
       z-index: 3;
       text-align: center;
+      display: none;
     }
 
     @keyframes moveDog {
@@ -97,10 +132,11 @@
       bottom: -100px;
       width: 40px;
       height: 60px;
-      border-radius: 50% 50% 50% 50%;
+      border-radius: 50%;
       opacity: 0.9;
       animation: floatBalloon 10s linear infinite;
       box-shadow: inset -3px -6px rgba(0,0,0,0.1);
+      display: none; /* 初始不显示 */
     }
 
     .balloon::after {
@@ -132,30 +168,186 @@
         opacity: 0;
       }
     }
+
+    @keyframes floatBlink {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      50% {
+        transform: translateY(-8px);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .second-prompt {
+      position: absolute;
+      top: 17vh; /* 桌面端默认 */
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.96);
+      padding: 1rem 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      text-align: center;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: #333;
+      z-index: 20;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    /* ✅ 针对手机屏幕的高度适配 */
+    @media (max-width: 600px) {
+      .second-prompt {
+        top: 1vh;  /* ✅ 原来是 16vh，现在提升到 10vh 更靠上 */
+        font-size: 1.1rem;
+        padding: 0.8rem 1rem;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -20px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .emphasis {
+      font-size: 1.3em;  /* 放大 */
+      font-weight: bold; /* 加粗 */
+      color: #222;       /* 稍微深一点让它更醒目 */
+    }
+
+    .click-again-text {
+      position: absolute;
+      top: 25vh;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.6rem;
+      color: #444;
+      z-index: 20;
+      text-align: center;
+      margin-top: 0.6rem;
+      animation: blink 1.2s infinite;
+    }
+
+    /* ✅ 手机端位置向上对齐第一次提示 */
+    @media (max-width: 600px) {
+      .click-again-text {
+        top: 8vh;         /* 向下偏移一些 */
+        font-size: 1.3rem;   /* 字体变小 */
+        line-height: 1.4;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .zelda-text {
+        font-size: 1.3rem; /* 更适配手机 */
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="scene">
-    <!-- 飘浮气球 -->
-    <div class="balloon red"></div>
-    <div class="balloon blue"></div>
-    <div class="balloon yellow"></div>
-    <div class="balloon green"></div>
-    <div class="balloon purple"></div>
-    <div class="balloon pink"></div>
+<div class="scene">
+  <!-- 气球 -->
+  <div class="balloon red"></div>
+  <div class="balloon blue"></div>
+  <div class="balloon yellow"></div>
+  <div class="balloon green"></div>
+  <div class="balloon purple"></div>
+  <div class="balloon pink"></div>
 
-    <!-- 狗狗 -->
-    <img src="img/dog.png" class="dog" alt="dog">
-
-    <!-- 礼物 -->
-    <a href="wish.html">
-      <img src="img/box.png" class="gift" alt="gift box">
-    </a>
-
-    <!-- 提示 -->
-    <div class="tap-text">点我打开礼物 🎁</div>
+  <!-- Zelda 初始状态 -->
+  <div class="zelda-container">
+    <div class="zelda-text">
+      Zelda 有秘密要告诉你～<br />
+      <span class="emoji-line">👇快点我！👇</span>
+    </div>
+    <img id="zelda" src="img/zelda.png" alt="Zelda">
   </div>
+
+  <!-- 第二次提示框 -->
+  <div class="second-prompt" id="secondPrompt" style="display: none;">
+    <p>🤫 嘘～准备好了吗？</p>
+    <p>Zelda 有小秘密要悄悄告诉你，记得 <span class="emphasis" id="volumeTip">打开声音</span>！</p>
+  </div>
+
+  <!-- 再次点击提示 -->
+  <div id="clickAgain" class="click-again-text" style="display: none;">
+    准备好后<br>
+    👇请再点一下 Zelda 👇
+  </div>
+
+  <!-- 播放视频 -->
+  <video id="zelda-video" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:300px; z-index:6;" autoplay muted playsinline preload="auto">
+    <source src="img/dog.mp4" type="video/mp4">
+  </video>
+
+  <!-- 后续动画内容 -->
+  <img src="img/dog.png" class="dog" id="dog-img" alt="dog">
+  <a href="wish.html">
+    <img src="img/box.png" class="gift" id="gift-box" alt="gift box">
+  </a>
+  <div class="tap-text" id="tap-tip">点我打开礼物 🎁</div>
+</div>
+
+<script>
+  let clickCount = 0;
+  let promptShown = false;
+  const zelda = document.getElementById('zelda');
+  const zeldaText = document.querySelector('.zelda-text');
+  const secondPrompt = document.getElementById('secondPrompt');
+  const clickAgain = document.getElementById('clickAgain');
+  const video = document.getElementById('zelda-video');
+  const dogImg = document.getElementById('dog-img');
+  const giftBox = document.getElementById('gift-box');
+  const tapTip = document.getElementById('tap-tip');
+
+  zelda.addEventListener('click', () => {
+    clickCount++;
+
+    if (clickCount === 1) {
+      secondPrompt.style.display = 'block';
+      zeldaText.style.display = 'none';
+
+      setTimeout(() => {
+        secondPrompt.style.display = 'none';
+        clickAgain.style.display = 'block';
+        promptShown = true; // ✅ 正确位置：5s 提示消失后才允许第二次点击
+      }, 5000);
+    } 
+    else if (clickCount === 2 && !promptShown) {
+      clickCount--; // 撤回增加，防止跳过流程
+      return;
+    }
+    else if (clickCount === 2 && promptShown) {
+      clickAgain.style.display = 'none';
+      zelda.style.display = 'none';
+      video.style.display = 'block';
+      video.currentTime = 0;
+      video.play();
+
+      // 播放 5 秒后暂停并显示狗子与礼盒
+      setTimeout(() => {
+        video.pause(); // 停止播放
+        video.currentTime = video.duration; // 定位到最后一帧（最好确保 duration 是 5s）
+
+        video.style.display = 'none';
+        dogImg.style.display = 'block';
+        giftBox.style.display = 'block';
+        tapTip.style.display = 'block';
+
+        document.querySelectorAll('.balloon').forEach(balloon => {
+          balloon.style.display = 'block';
+        });
+      }, 5000); // 播放 5 秒
+    }
+  });
+</script>
 
 </body>
 </html>
