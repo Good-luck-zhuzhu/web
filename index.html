@@ -89,15 +89,22 @@
 
     .tap-text {
       position: absolute;
-      bottom: 50vh;
+      top: 15vh;  /* 可手动微调 */
       left: 50%;
       transform: translateX(-50%);
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       color: #4d4d4d;
       animation: blink 1.2s infinite;
-      z-index: 3;
+      z-index: 4;
       text-align: center;
       display: none;
+    }
+
+    @media (max-width: 600px) {
+      .tap-text {
+        top: 9vh;         /* 手机上再往上移动 */
+        font-size: 1.4rem; /* 字体略小更适配 */
+      }
     }
 
     @keyframes moveDog {
@@ -125,6 +132,24 @@
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
+    }
+
+    @keyframes popUpGift {
+      0% {
+        transform: scale(0.2) translate(-50%, 0);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(1.1) translate(-50%, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) translate(-50%, 0);
+      }
+    }
+
+    .gift.pop {
+      animation: popUpGift 0.8s ease-out forwards;
     }
 
     .balloon {
@@ -288,11 +313,10 @@
   </video>
 
   <!-- 后续动画内容 -->
-  <img src="img/dog.png" class="dog" id="dog-img" alt="dog">
   <a href="wish.html">
-    <img src="img/box.png" class="gift" id="gift-box" alt="gift box">
+    <img src="img/box.png" class="gift" id="gift-box" alt="gift box" style="display:none;">
   </a>
-  <div class="tap-text" id="tap-tip">点我打开礼物 🎁</div>
+  <div class="tap-text" id="tap-tip">👇点击🎁打开👇</div>
 </div>
 
 <script>
@@ -303,7 +327,6 @@
   const secondPrompt = document.getElementById('secondPrompt');
   const clickAgain = document.getElementById('clickAgain');
   const video = document.getElementById('zelda-video');
-  const dogImg = document.getElementById('dog-img');
   const giftBox = document.getElementById('gift-box');
   const tapTip = document.getElementById('tap-tip');
 
@@ -331,20 +354,21 @@
       video.currentTime = 0;
       video.play();
 
-      // 播放 5 秒后暂停并显示狗子与礼盒
+      // 播放 5 秒后暂停并显示礼盒
       setTimeout(() => {
-        video.pause(); // 停止播放
-        video.currentTime = video.duration; // 定位到最后一帧（最好确保 duration 是 5s）
-
+        video.pause();
         video.style.display = 'none';
-        dogImg.style.display = 'block';
+
+        // 添加礼盒弹出效果
         giftBox.style.display = 'block';
+        giftBox.classList.add('pop');
+
         tapTip.style.display = 'block';
 
         document.querySelectorAll('.balloon').forEach(balloon => {
           balloon.style.display = 'block';
         });
-      }, 5000); // 播放 5 秒
+      }, 5000);
     }
   });
 </script>
