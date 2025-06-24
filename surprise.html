@@ -54,7 +54,7 @@
       box-shadow: 0 6px 12px rgba(0,0,0,0.3);
       z-index: 2;
       cursor: pointer;
-      transition: opacity 0.3s ease; /* 🆕 淡出淡入 */
+      transition: opacity 0.3s ease;
     }
 
     .person-photo.large {
@@ -138,10 +138,12 @@
 
     #typeText {
       font-family: 'Arial', sans-serif;
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       font-style: normal;
+      font-weight: bold;
+      display: inline-block;
+      white-space: nowrap;
       text-align: center;
-      white-space: normal;
     }
   </style>
 </head>
@@ -172,7 +174,9 @@
   let isWishPromptShown = false;
   let isWishMade = false;
   let isCandleBlownOut = false;
-  let hasEnteredCakeSequence = false; // 🆕 防止重复触发蛋糕流程
+  let hasEnteredCakeSequence = false;
+  let isClickable = false;
+  let canPlayMusic = false; // 🎵 控制音乐播放权限
 
   function dropConfettiFromTop() {
     const duration = 3000;
@@ -188,14 +192,9 @@
         ticks: 200,
         scalar: 1.5,
         colors: colors,
-        origin: {
-          x: Math.random(),
-          y: 0
-        }
+        origin: { x: Math.random(), y: 0 }
       });
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
+      if (Date.now() < end) requestAnimationFrame(frame);
     })();
   }
 
@@ -204,7 +203,6 @@
     const element = document.getElementById(elementId);
     element.textContent = "";
     isTyping = true;
-
     function type() {
       if (i < text.length) {
         element.textContent += text.charAt(i);
@@ -215,28 +213,49 @@
         if (typeof callback === 'function') callback();
       }
     }
-
     type();
   }
 
   window.onload = () => {
     dropConfettiFromTop();
-
     setTimeout(() => {
       document.querySelector('.foto-wrapper').style.display = 'none';
+      canPlayMusic = true; // 🎵 允许播放音乐
       const typingBox = document.getElementById('typingBox');
       typingBox.style.display = 'block';
       typeWriter("听说有人喜欢和姥爷去海底捞，那么！", "typeText", 130, () => {
-        document.getElementById('birthday-music').play();
-        document.getElementById('clickTip').style.display = 'block';
+        setTimeout(() => {
+          const typeText = document.getElementById('typeText');
+          typeText.textContent = "";
+
+          const tip = document.createElement('span');
+          tip.textContent = "点击美女照片！";
+          tip.style.fontWeight = 'bold';
+          tip.style.fontSize = '1.2rem';
+          tip.style.color = '#c0392b';
+          typeText.appendChild(tip);
+
+          setTimeout(() => {
+            isClickable = true;
+          }, 800);
+        }, 2000);
       });
     }, 3000);
   };
 
-  document.getElementById('personPhoto').addEventListener('click', () => {
-    if (isTyping) return;
+  // 🎵 用户首次点击才播放生日歌（浏览器允许）
+  document.body.addEventListener('click', () => {
+    const music = document.getElementById('birthday-music');
+    if (canPlayMusic && music.paused) {
+      music.play().catch(() => {});
+      canPlayMusic = false; // 避免多次触发
+    }
+  }, { once: true });
 
-    const photo = document.getElementById('personPhoto');
+  document.getElementById('personPhoto').addEventListener('click', () => {
+    if (!isClickable || isTyping) return;
+
+    let photo = document.getElementById('personPhoto');
     const typingBox = document.getElementById('typingBox');
     const typeText = document.getElementById('typeText');
     const clickTip = document.getElementById('clickTip');
@@ -247,7 +266,27 @@
       photo.src = "img/cake/cake_out.png";
       typeText.textContent = "";
       setTimeout(() => {
-        typeWriter("愿望已送达 ✨", "typeText", 100);
+        const typeText = document.getElementById("typeText");
+        typeText.innerHTML = '<span style="color: #e74c3c; font-weight: bold;">愿望已送达 ✨</span>';
+
+        // 5秒后显示新字幕
+        setTimeout(() => {
+          typeText.innerHTML = '<span>还没结束哦~ 😊</span>';
+
+          const music = document.getElementById('birthday-music');
+
+          function redirectToWish() {
+            window.location.href = 'wish.html';
+          }
+
+          if (music.ended || music.paused) {
+            // 歌曲已结束或没播放，直接跳转
+            redirectToWish();
+          } else {
+            // 歌曲没结束，监听结束后跳转
+            music.addEventListener('ended', redirectToWish);
+          }
+        }, 5000);
       }, 300);
       return;
     }
@@ -276,7 +315,6 @@
 
     if (isCandleBlownOut) return;
 
-    // 🆕 防止多次触发蛋糕流程
     if (!isCakeLit && !hasEnteredCakeSequence) {
       hasEnteredCakeSequence = true;
 
@@ -284,59 +322,119 @@
       typeText.textContent = '';
       clickTip.style.display = 'none';
 
-      photo.style.opacity = '0';
-      setTimeout(() => {
-        photo.style.display = 'none';
-        photo.src = 'img/photo/haidilao.png';
-        photo.classList.add('large', 'cake-photo');
-        photo.style.display = 'block';
-        photo.style.opacity = '1';
+      photo.remove(); // ✅ 删除原图片
 
-        if (birthdayMusic.paused) birthdayMusic.play().catch(() => {});
+      const newPhoto = document.createElement('img');
+      newPhoto.src = 'img/photo/haidilao.png';
+      newPhoto.alt = '海底捞';
+      newPhoto.id = 'personPhoto';
+      newPhoto.className = 'person-photo cake-photo';
+      newPhoto.style.width = '320px';
+      newPhoto.style.opacity = '1';
+      newPhoto.style.position = 'fixed';
+      newPhoto.style.bottom = '2%';
+      newPhoto.style.left = '50%';
+      newPhoto.style.transform = 'translateX(-50%)';
+      newPhoto.style.zIndex = '2';
+      newPhoto.style.borderRadius = '14px';
+      newPhoto.style.boxShadow = '0 6px 12px rgba(0,0,0,0.3)';
+      newPhoto.style.cursor = 'pointer';
 
-        setTimeout(() => {
-          if (isCakeLit) return;
+      document.body.appendChild(newPhoto);
+      photo = newPhoto;
 
-          typingBox.classList.add('cake-box');
-          typingBox.style.display = 'block';
+      if (birthdayMusic.paused) birthdayMusic.play().catch(() => {});
 
-          typeWriter("上蛋糕！", "typeText", 150, () => {
-            photo.style.display = 'none';
+      // ✅ 新增：绑定事件
+      newPhoto.addEventListener('click', () => {
+        if (newPhoto.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
+          isCandleBlownOut = true;
+          newPhoto.src = "img/cake/cake_out.png";
+          typeText.textContent = "";
+          setTimeout(() => {
+            const typeText = document.getElementById("typeText");
+            typeText.innerHTML = '<span style="color: #e74c3c; font-weight: bold;">愿望已送达 ✨</span>';
 
+            // 5秒后显示新字幕
             setTimeout(() => {
-              photo.src = 'img/cake/cake_origin.png';
-              photo.classList.add('large', 'cake-photo', 'cake-slide-in');
-              photo.style.display = 'block';
+              typeText.innerHTML = '<span>还没结束哦~ 😊</span>';
 
+              const music = document.getElementById('birthday-music');
+
+              function redirectToWish() {
+                window.location.href = 'wish.html';
+              }
+
+              if (music.ended || music.paused) {
+                // 歌曲已结束或没播放，直接跳转
+                redirectToWish();
+              } else {
+                // 歌曲没结束，监听结束后跳转
+                music.addEventListener('ended', redirectToWish);
+              }
+            }, 5000);
+          }, 300);
+          return;
+        }
+
+        if (newPhoto.src.includes('cake_origin.png') && !isCakeLit) {
+          isCakeLit = true;
+          newPhoto.src = "img/cake/cake_light.png";
+          typeText.textContent = "";
+          clickTip.style.display = 'none';
+          typingBox.classList.add('invisible');
+
+          setTimeout(() => {
+            typingBox.classList.remove('invisible');
+            typingBox.style.display = 'block';
+            typeWriter("许个愿吧！", "typeText", 120, () => {
               setTimeout(() => {
                 typeText.textContent = "";
-                typeWriter("Happy Birthday to Natalie!", "typeText", 100, () => {
-                  setTimeout(() => {
-                    typeText.textContent = "";
-                    typeText.innerHTML = `<span>点击星星蜡烛点燃 🔥</span>`;
-                    typeText.style.display = 'flex';
-                    typeText.style.alignItems = 'center';
-                    typeText.style.justifyContent = 'center';
-                    typeText.style.gap = '0.5rem';
-                    typeText.style.fontSize = '1.2rem';
-                    typeText.style.fontWeight = 'bold';
-                    typeText.style.color = '#e67e22';
-                  }, 2000);
+                typeWriter("许好愿后点击蜡烛吹灭", "typeText", 100, () => {
+                  isWishPromptShown = true;
                 });
-              }, 1000);
-            }, 400);
-          });
-        }, 5000);
-      }, 300);
+              }, 3000);
+            });
+          }, 2000);
+          return;
+        }
+      });
+
+      setTimeout(() => {
+        if (isCakeLit) return;
+
+        typingBox.classList.add('cake-box');
+        typingBox.style.display = 'block';
+
+        typeWriter("上蛋糕！", "typeText", 150, () => {
+          photo.style.display = 'none';
+
+          setTimeout(() => {
+            photo.src = 'img/cake/cake_origin.png';
+            photo.classList.add('cake-photo', 'cake-slide-in');
+            photo.style.display = 'block';
+
+            setTimeout(() => {
+              typeText.textContent = "";
+              typeWriter("Happy Birthday to 竹竹!", "typeText", 100, () => {
+                setTimeout(() => {
+                  typeText.textContent = "";
+                  typeText.innerHTML = `<span>点击星星蜡烛点燃 🔥</span>`;
+                  typeText.style.display = 'flex';
+                  typeText.style.alignItems = 'center';
+                  typeText.style.justifyContent = 'center';
+                  typeText.style.gap = '0.5rem';
+                  typeText.style.fontSize = '1.2rem';
+                  typeText.style.fontWeight = 'bold';
+                  typeText.style.color = '#e67e22';
+                }, 2000);
+              });
+            }, 1000);
+          }, 400);
+        });
+      }, 5000);
     }
   });
-
-  document.body.addEventListener('click', () => {
-    const music = document.getElementById('birthday-music');
-    if (music.paused) {
-      music.play().catch(() => {});
-    }
-  }, { once: true });
 </script>
 </body>
 </html>
