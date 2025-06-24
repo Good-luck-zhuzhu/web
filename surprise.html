@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>生日快乐</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Pacifico&display=swap');
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #FEC0CD url('img/background_page2.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .foto-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      animation: slideDown 2.5s ease-out forwards;
+      transform: translateY(-100vh);
+    }
+
+    .foto {
+      width: 80%;
+      max-width: 500px;
+      min-width: 300px;
+      margin-top: 20px;
+    }
+
+    .person-photo {
+      position: fixed;
+      bottom: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      border-radius: 14px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      z-index: 2;
+      cursor: pointer;
+      transition: opacity 0.3s ease; /* 🆕 淡出淡入 */
+    }
+
+    .person-photo.large {
+      width: 320px !important;
+    }
+
+    .person-photo.cake-photo {
+      bottom: 2% !important;
+    }
+
+    @keyframes slideDown {
+      0% { transform: translateY(-100vh); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .foto {
+        margin-top: 0px;
+      }
+      .person-photo {
+        width: 180px;
+        bottom: 6%;
+      }
+    }
+
+    .typing-box {
+      position: fixed;
+      bottom: 48%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 90%;
+      font-family: 'ZCOOL XiaoWei', 'Pacifico', cursive;
+      font-size: 1.2rem;
+      color: #333;
+      z-index: 5;
+      display: none;
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    @media (max-width: 600px) {
+      .typing-box {
+        bottom: 76% !important;
+      }
+    }
+
+    .typing-box.cake-box {
+      bottom: 85% !important;
+    }
+
+    .typing-box.invisible {
+      display: none !important;
+      opacity: 0 !important;
+      animation: none !important;
+    }
+
+    @keyframes slideCakeUp {
+      0% {
+        transform: translateX(-50%) translateY(100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .person-photo.cake-slide-in {
+      animation: slideCakeUp 1s ease-out forwards;
+    }
+
+    #typeText {
+      font-family: 'Arial', sans-serif;
+      font-size: 0.95rem;
+      font-style: normal;
+      text-align: center;
+      white-space: normal;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<img class="person-photo" id="personPhoto" src="img/photo/photo1.jpg" alt="Ta的照片">
+
+<div class="foto-wrapper">
+  <img class="foto" src="img/hbd1.png" alt="生日快乐">
+</div>
+
+<div class="typing-box" id="typingBox">
+  <p id="typeText"></p>
+  <p id="clickTip" style="display:none; margin-top: 1rem; font-size: 1rem; color: #c0392b;">点击照片</p>
+</div>
+
+<audio id="birthday-music" src="music/birthday_song.MP3" preload="auto"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+  const canvas = document.getElementById('confetti-canvas');
+  const confettiInstance = confetti.create(canvas, { resize: true, useWorker: true });
+
+  let isTyping = false;
+  let isCakeLit = false;
+  let isWishPromptShown = false;
+  let isWishMade = false;
+  let isCandleBlownOut = false;
+  let hasEnteredCakeSequence = false; // 🆕 防止重复触发蛋糕流程
+
+  function dropConfettiFromTop() {
+    const duration = 3000;
+    const end = Date.now() + duration;
+    const colors = ['#ff3cac', '#ffae00', '#00f2fe', '#f56991', '#00ff7f', '#fffc00'];
+
+    (function frame() {
+      confettiInstance({
+        particleCount: 10,
+        spread: 50,
+        startVelocity: 50,
+        gravity: 1.6,
+        ticks: 200,
+        scalar: 1.5,
+        colors: colors,
+        origin: {
+          x: Math.random(),
+          y: 0
+        }
+      });
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  }
+
+  function typeWriter(text, elementId, speed, callback) {
+    let i = 0;
+    const element = document.getElementById(elementId);
+    element.textContent = "";
+    isTyping = true;
+
+    function type() {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      } else {
+        isTyping = false;
+        if (typeof callback === 'function') callback();
+      }
+    }
+
+    type();
+  }
+
+  window.onload = () => {
+    dropConfettiFromTop();
+
+    setTimeout(() => {
+      document.querySelector('.foto-wrapper').style.display = 'none';
+      const typingBox = document.getElementById('typingBox');
+      typingBox.style.display = 'block';
+      typeWriter("听说有人喜欢和姥爷去海底捞，那么！", "typeText", 130, () => {
+        document.getElementById('birthday-music').play();
+        document.getElementById('clickTip').style.display = 'block';
+      });
+    }, 3000);
+  };
+
+  document.getElementById('personPhoto').addEventListener('click', () => {
+    if (isTyping) return;
+
+    const photo = document.getElementById('personPhoto');
+    const typingBox = document.getElementById('typingBox');
+    const typeText = document.getElementById('typeText');
+    const clickTip = document.getElementById('clickTip');
+    const birthdayMusic = document.getElementById('birthday-music');
+
+    if (photo.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
+      isCandleBlownOut = true;
+      photo.src = "img/cake/cake_out.png";
+      typeText.textContent = "";
+      setTimeout(() => {
+        typeWriter("愿望已送达 ✨", "typeText", 100);
+      }, 300);
+      return;
+    }
+
+    if (photo.src.includes('cake_origin.png') && !isCakeLit) {
+      isCakeLit = true;
+      photo.src = "img/cake/cake_light.png";
+      typeText.textContent = "";
+      clickTip.style.display = 'none';
+      typingBox.classList.add('invisible');
+
+      setTimeout(() => {
+        typingBox.classList.remove('invisible');
+        typingBox.style.display = 'block';
+        typeWriter("许个愿吧！", "typeText", 120, () => {
+          setTimeout(() => {
+            typeText.textContent = "";
+            typeWriter("许好愿后点击蜡烛吹灭", "typeText", 100, () => {
+              isWishPromptShown = true;
+            });
+          }, 3000);
+        });
+      }, 2000);
+      return;
+    }
+
+    if (isCandleBlownOut) return;
+
+    // 🆕 防止多次触发蛋糕流程
+    if (!isCakeLit && !hasEnteredCakeSequence) {
+      hasEnteredCakeSequence = true;
+
+      typingBox.style.display = 'none';
+      typeText.textContent = '';
+      clickTip.style.display = 'none';
+
+      photo.style.opacity = '0';
+      setTimeout(() => {
+        photo.style.display = 'none';
+        photo.src = 'img/photo/haidilao.png';
+        photo.classList.add('large', 'cake-photo');
+        photo.style.display = 'block';
+        photo.style.opacity = '1';
+
+        if (birthdayMusic.paused) birthdayMusic.play().catch(() => {});
+
+        setTimeout(() => {
+          if (isCakeLit) return;
+
+          typingBox.classList.add('cake-box');
+          typingBox.style.display = 'block';
+
+          typeWriter("上蛋糕！", "typeText", 150, () => {
+            photo.style.display = 'none';
+
+            setTimeout(() => {
+              photo.src = 'img/cake/cake_origin.png';
+              photo.classList.add('large', 'cake-photo', 'cake-slide-in');
+              photo.style.display = 'block';
+
+              setTimeout(() => {
+                typeText.textContent = "";
+                typeWriter("Happy Birthday to Natalie!", "typeText", 100, () => {
+                  setTimeout(() => {
+                    typeText.textContent = "";
+                    typeText.innerHTML = `<span>点击星星蜡烛点燃 🔥</span>`;
+                    typeText.style.display = 'flex';
+                    typeText.style.alignItems = 'center';
+                    typeText.style.justifyContent = 'center';
+                    typeText.style.gap = '0.5rem';
+                    typeText.style.fontSize = '1.2rem';
+                    typeText.style.fontWeight = 'bold';
+                    typeText.style.color = '#e67e22';
+                  }, 2000);
+                });
+              }, 1000);
+            }, 400);
+          });
+        }, 5000);
+      }, 300);
+    }
+  });
+
+  document.body.addEventListener('click', () => {
+    const music = document.getElementById('birthday-music');
+    if (music.paused) {
+      music.play().catch(() => {});
+    }
+  }, { once: true });
+</script>
+</body>
+</html>
