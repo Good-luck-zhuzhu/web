@@ -44,12 +44,13 @@
       margin-top: 20px;
     }
 
-    .person-photo {
+    .person-photo,
+    .person-photo.cake-photo {
       position: fixed;
-      bottom: 4%;
+      top: 25%;
       left: 50%;
       transform: translateX(-50%);
-      width: 220px;
+      width: 360px;
       border-radius: 14px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.3);
       z-index: 2;
@@ -58,11 +59,15 @@
     }
 
     .person-photo.large {
-      width: 320px !important;
+      width: 360px !important;
     }
 
     .person-photo.cake-photo {
-      bottom: 2% !important;
+      top: 25% !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: 360px !important;
+      bottom: auto !important;
     }
 
     @keyframes slideDown {
@@ -75,15 +80,27 @@
       .foto {
         margin-top: 0px;
       }
-      .person-photo {
-        width: 180px;
-        bottom: 6%;
+      .person-photo,
+      .person-photo.cake-photo {
+        top: 25% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 240px !important;
+        bottom: auto !important;
+      }
+      .person-photo.large-photo,
+      .person-photo.cake-photo.large-photo {
+        width: 270px !important;
+      }
+      .typing-box,
+      .typing-box.cake-box {
+        bottom: 80% !important;   /* 你觉得哪个值合适就用哪个，比如70%，可调试 */
       }
     }
 
     .typing-box {
       position: fixed;
-      bottom: 48%;
+      bottom: 80%;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.85);
@@ -103,16 +120,6 @@
     @keyframes fadeIn {
       from { opacity: 0; transform: translate(-50%, -10px); }
       to   { opacity: 1; transform: translate(-50%, 0); }
-    }
-
-    @media (max-width: 600px) {
-      .typing-box {
-        bottom: 76% !important;
-      }
-    }
-
-    .typing-box.cake-box {
-      bottom: 85% !important;
     }
 
     .typing-box.invisible {
@@ -145,13 +152,22 @@
       white-space: nowrap;
       text-align: center;
     }
+
+    body.dark-bg::before {
+      content: "";
+      position: fixed;
+      left: 0; top: 0; right: 0; bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: rgba(0,0,0,0.55); /* 暗度可调 */
+    }
   </style>
 </head>
 <body>
 
 <canvas id="confetti-canvas"></canvas>
 
-<img class="person-photo" id="personPhoto" src="img/photo/photo1.jpg" alt="Ta的照片">
+<img class="person-photo" id="personPhoto" src="img/photo/photo1.jpg" alt="Ta的照片" style="display:none;">
 
 <div class="foto-wrapper">
   <img class="foto" src="img/hbd1.png" alt="生日快乐">
@@ -179,9 +195,9 @@
   let canPlayMusic = false; // 🎵 控制音乐播放权限
 
   function dropConfettiFromTop() {
-    const duration = 3000;
+    const duration = 2000;
     const end = Date.now() + duration;
-    const colors = ['#ff3cac', '#ffae00', '#00f2fe', '#f56991', '#00ff7f', '#fffc00'];
+    const colors = ['#007bff', '#28a745', '#6f42c1', '#fd7e14', '#20c997', '#ffc107'];
 
     (function frame() {
       confettiInstance({
@@ -220,6 +236,10 @@
     dropConfettiFromTop();
     setTimeout(() => {
       document.querySelector('.foto-wrapper').style.display = 'none';
+
+      // 让照片出现
+      document.getElementById('personPhoto').style.display = 'block';
+
       canPlayMusic = true; // 🎵 允许播放音乐
       const typingBox = document.getElementById('typingBox');
       typingBox.style.display = 'block';
@@ -240,7 +260,7 @@
           }, 800);
         }, 2000);
       });
-    }, 3000);
+    }, 3500);
   };
 
   // 🎵 用户首次点击才播放生日歌（浏览器允许）
@@ -264,6 +284,7 @@
     if (photo.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
       isCandleBlownOut = true;
       photo.src = "img/cake/cake_out.png";
+      document.body.classList.remove('dark-bg');
       typeText.textContent = "";
       setTimeout(() => {
         const typeText = document.getElementById("typeText");
@@ -294,6 +315,7 @@
     if (photo.src.includes('cake_origin.png') && !isCakeLit) {
       isCakeLit = true;
       photo.src = "img/cake/cake_light.png";
+      document.body.classList.add('dark-bg');
       typeText.textContent = "";
       clickTip.style.display = 'none';
       typingBox.classList.add('invisible');
@@ -328,11 +350,9 @@
       newPhoto.src = 'img/photo/haidilao.png';
       newPhoto.alt = '海底捞';
       newPhoto.id = 'personPhoto';
-      newPhoto.className = 'person-photo cake-photo';
-      newPhoto.style.width = '320px';
+      newPhoto.className = 'person-photo cake-photo large-photo';
       newPhoto.style.opacity = '1';
       newPhoto.style.position = 'fixed';
-      newPhoto.style.bottom = '2%';
       newPhoto.style.left = '50%';
       newPhoto.style.transform = 'translateX(-50%)';
       newPhoto.style.zIndex = '2';
@@ -350,6 +370,7 @@
         if (newPhoto.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
           isCandleBlownOut = true;
           newPhoto.src = "img/cake/cake_out.png";
+          document.body.classList.remove('dark-bg');
           typeText.textContent = "";
           setTimeout(() => {
             const typeText = document.getElementById("typeText");
@@ -380,6 +401,7 @@
         if (newPhoto.src.includes('cake_origin.png') && !isCakeLit) {
           isCakeLit = true;
           newPhoto.src = "img/cake/cake_light.png";
+          document.body.classList.add('dark-bg');
           typeText.textContent = "";
           clickTip.style.display = 'none';
           typingBox.classList.add('invisible');
@@ -411,7 +433,7 @@
 
           setTimeout(() => {
             photo.src = 'img/cake/cake_origin.png';
-            photo.classList.add('cake-photo', 'cake-slide-in');
+            photo.classList.add('cake-photo', 'cake-slide-in', 'large-photo');
             photo.style.display = 'block';
 
             setTimeout(() => {
