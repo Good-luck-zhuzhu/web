@@ -94,7 +94,14 @@
       }
       .typing-box,
       .typing-box.cake-box {
-        bottom: 80% !important;   /* 你觉得哪个值合适就用哪个，比如70%，可调试 */
+        top: 5% !important;        /* ✅ 上移打字机 */
+        bottom: auto !important;
+        padding: 0.8rem 1.2rem;    /* ✅ 更紧凑的内边距 */
+        font-size: 1rem;
+      }
+
+      #typeText {
+        font-size: 1rem;
       }
     }
 
@@ -110,6 +117,11 @@
       max-width: 90vw;    /* 移动端自适应 */
       min-width: 120px;
       width: max-content; /* 关键，让内容撑宽，而不是百分百宽 */
+      max-height: 40vh;         /* ✅ 防止太高 */
+      overflow-y: auto;         /* ✅ 超出内容可滚动 */
+      display: flex;            /* ✅ 让内容垂直居中 */
+      flex-direction: column;
+      justify-content: center;
       font-family: 'ZCOOL XiaoWei', 'Pacifico', cursive;
       font-size: 1.2rem;
       color: #333;
