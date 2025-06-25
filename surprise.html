@@ -100,14 +100,16 @@
 
     .typing-box {
       position: fixed;
-      bottom: 80%;
       left: 50%;
+      top: 3%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.85);
       border-radius: 16px;
       padding: 1rem 1.5rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      max-width: 90%;
+      max-width: 90vw;    /* 移动端自适应 */
+      min-width: 120px;
+      width: max-content; /* 关键，让内容撑宽，而不是百分百宽 */
       font-family: 'ZCOOL XiaoWei', 'Pacifico', cursive;
       font-size: 1.2rem;
       color: #333;
@@ -182,18 +184,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <script>
-  (function preloadCakeImages() {
-    const imgs = [
-      "img/cake/cake_origin.png",
-      "img/cake/cake_light.png",
-      "img/cake/cake_out.png"
-    ];
-    imgs.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-  })();
-
   const canvas = document.getElementById('confetti-canvas');
   const confettiInstance = confetti.create(canvas, { resize: true, useWorker: true });
 
