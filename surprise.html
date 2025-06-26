@@ -279,17 +279,17 @@
     }, 3500);
   };
 
-  // 🎵 用户首次点击才播放生日歌（浏览器允许）
-  document.body.addEventListener('click', () => {
-    const music = document.getElementById('birthday-music');
-    if (canPlayMusic && music.paused) {
-      music.play().catch(() => {});
-      canPlayMusic = false; // 避免多次触发
-    }
-  }, { once: true });
-
   document.getElementById('personPhoto').addEventListener('click', () => {
     if (!isClickable || isTyping) return;
+
+    // ✅ 只有提示出现后点击照片才播放音乐
+    if (canPlayMusic) {
+      const music = document.getElementById('birthday-music');
+      if (music.paused) {
+        music.play().catch(() => {});
+      }
+      canPlayMusic = false;
+    }
 
     let photo = document.getElementById('personPhoto');
     const typingBox = document.getElementById('typingBox');
@@ -323,7 +323,7 @@
             // 歌曲没结束，监听结束后跳转
             music.addEventListener('ended', redirectToWish);
           }
-        }, 5000);
+        }, 6000);
       }, 300);
       return;
     }
@@ -444,7 +444,7 @@
         typingBox.classList.add('cake-box');
         typingBox.style.display = 'block';
 
-        typeWriter("上蛋糕！", "typeText", 150, () => {
+        typeWriter("上蛋糕！", "typeText", 250, () => {
           photo.style.display = 'none';
 
           setTimeout(() => {
@@ -454,7 +454,7 @@
 
             setTimeout(() => {
               typeText.textContent = "";
-              typeWriter("Happy Birthday to 竹竹!", "typeText", 100, () => {
+              typeWriter("Happy Birthday to 竹竹!", "typeText", 180, () => {
                 setTimeout(() => {
                   typeText.textContent = "";
                   typeText.innerHTML = `<span>点击星星蜡烛点燃 🔥</span>`;
