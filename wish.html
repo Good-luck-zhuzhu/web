@@ -3,25 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>生日快乐！</title>
+  <link rel="icon" href="img/cake/cake_icon_gpt.png" type="image/png" />
+  <title>生日祝福来咯～</title>
 
   <style>
     @import url("https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap");
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{
+    * {margin:0;padding:0;box-sizing:border-box}
+    body {
       height:100vh;
       display:flex;
       justify-content:center;
       align-items:center;
       background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%);
       font-family:"ZCOOL KuaiLe",cursive;
-      color:#fff;text-align:center;
+      color:#fff;
+      text-align:center;
       overflow:hidden;
+      padding: 20px;
     }
-    h1{font-size:2.4rem;margin-bottom:1rem}
-    p{font-size:1.2rem;line-height:1.6;max-width:320px;margin:0 auto}
-    /* 让纸屑 canvas 全屏铺底，禁用点击 */
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none}
+    h1 {
+      font-size:3rem;
+      margin-bottom:1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    #typewriter {
+      font-size:1.4rem;
+      line-height:1.8;
+      max-width:360px;
+      margin:0 auto;
+      white-space:pre-wrap;
+      word-break:break-all;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    canvas {
+      position:fixed;
+      top:0;left:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+    }
   </style>
 </head>
 <body>
@@ -32,17 +52,53 @@
   <!-- 祝福语块 -->
   <div>
     <h1>生日快乐！</h1>
-    <p>愿你眼里总有光芒，<br>心中常怀希望，<br>未来的每一天都甜甜的～</p>
+    <p id="typewriter"></p>
   </div>
 
-  <!-- 体积很小的 canvas-confetti CDN -->
+  <!-- 打字机脚本 -->
+  <script>
+  const lines = [
+    "竹竹竹竹竹！（重要的竹说五遍！）",
+    "🎂 吃货女王生日预警⚠️：",
+    "🎉 快乐值爆表中！💥",
+    "✨ 已为你开通专属服务：",
+    "🎁【365天快乐无限续杯🍹】",
+    "👑 年度至尊VIP特权：",
+    "🍀【好运正在全面加速中...🚀】"
+  ];
+
+    const typewriter = document.getElementById("typewriter");
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentText = "";
+
+    function typeCharacter() {
+      if (lineIndex < lines.length) {
+        const line = lines[lineIndex];
+        if (charIndex < line.length) {
+          currentText += line[charIndex];
+          typewriter.innerText = currentText;
+          charIndex++;
+          setTimeout(typeCharacter, 150);
+        } else {
+          currentText += '\n';
+          charIndex = 0;
+          lineIndex++;
+          setTimeout(typeCharacter, 500);
+        }
+      }
+    }
+
+    typeCharacter();
+  </script>
+
+  <!-- 彩纸动画 -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
-    /* 简单的 8 秒五彩纸屑 */
     (function(){
       const duration = 8000;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity:30, spread:360, ticks:60, zIndex:0 };
+      const defaults = { startVelocity:40, spread:360, ticks:100, zIndex:0 };
 
       function randomRange(min,max){ return Math.random()*(max-min)+min; }
 
@@ -50,7 +106,7 @@
         const timeLeft = animationEnd - Date.now();
         if(timeLeft <= 0){ clearInterval(interval); return; }
 
-        const particleCount = 50 * (timeLeft / duration);
+        const particleCount = 80 * (timeLeft / duration);
         confetti(Object.assign({}, defaults, {
           particleCount,
           origin:{ x: randomRange(0.1,0.3), y: Math.random() - 0.2 }
@@ -62,5 +118,6 @@
       }, 250);
     })();
   </script>
+
 </body>
-</html> 
+</html>
