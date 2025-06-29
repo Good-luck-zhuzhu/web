@@ -7,6 +7,7 @@
 
   <title>🐕 Zelda 派件中</title>
   <style>
+    /* 保留现有的样式 */
     html, body {
       margin: 0;
       padding: 0;
@@ -300,7 +301,7 @@
   <!-- 第二次提示框 -->
   <div class="second-prompt" id="secondPrompt" style="display: none;">
     <p>🤫 嘘～准备好了吗？</p>
-    <p>Zelda 有小秘密要悄悄告诉你，记得 <span class="emphasis" id="volumeTip">打开声音</span>！</p>
+    <p>Zelda 有小秘密要悄悄告诉你哦，记得 <span class="emphasis" id="volumeTip">打开声音</span>！</p>
   </div>
 
   <!-- 再次点击提示 -->
@@ -313,6 +314,10 @@
   <video id="zelda-video" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:300px; z-index:6;" autoplay muted playsinline preload="auto">
     <source src="img/dog.mp4" type="video/mp4">
   </video>
+
+  <!-- 播放音乐 -->
+  <audio id="zelda-music" src="music/ezuojv.MP3" preload="auto"></audio>
+  <!-- <audio id="zelda-music" src="music/speicalpeople.MP3" preload="auto"></audio> -->
 
   <!-- 后续动画内容 -->
   <a href="surprise.html">
@@ -331,6 +336,7 @@
   const video = document.getElementById('zelda-video');
   const giftBox = document.getElementById('gift-box');
   const tapTip = document.getElementById('tap-tip');
+  const music = document.getElementById('zelda-music');  // 音乐元素
 
   zelda.addEventListener('click', () => {
     clickCount++;
@@ -342,11 +348,11 @@
       setTimeout(() => {
         secondPrompt.style.display = 'none';
         clickAgain.style.display = 'block';
-        promptShown = true; // ✅ 正确位置：5s 提示消失后才允许第二次点击
+        promptShown = true;
       }, 5000);
     } 
     else if (clickCount === 2 && !promptShown) {
-      clickCount--; // 撤回增加，防止跳过流程
+      clickCount--; 
       return;
     }
     else if (clickCount === 2 && promptShown) {
@@ -355,13 +361,13 @@
       video.style.display = 'block';
       video.currentTime = 0;
       video.play();
+      music.play();  // 播放音乐
 
       // 播放 5 秒后暂停并显示礼盒
       setTimeout(() => {
         video.pause();
         video.style.display = 'none';
 
-        // 添加礼盒弹出效果
         giftBox.style.display = 'block';
         giftBox.classList.add('pop');
 

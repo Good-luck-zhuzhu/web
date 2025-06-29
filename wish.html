@@ -86,8 +86,14 @@
           lineIndex++;
           setTimeout(typeCharacter, 500);
         }
+      } else {
+        // 所有内容打完后，1秒后跳转
+        setTimeout(() => {
+          window.location.href = "fireworks.html";  // 确保路径正确
+        }, 1000);
       }
     }
+
 
     typeCharacter();
   </script>
