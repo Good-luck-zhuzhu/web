@@ -52,7 +52,7 @@
       top: 25%;
       left: 50%;
       transform: translateX(-50%);
-      width: 360px;
+      width: 400px;
       border-radius: 14px;
       box-shadow: 0 6px 12px rgba(0,0,0,0.3);
       z-index: 2;
@@ -87,7 +87,7 @@
         top: 25% !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 240px !important;
+        width: 270px !important;
         bottom: auto !important;
       }
       .person-photo.large-photo,
@@ -183,7 +183,7 @@
 
 <canvas id="confetti-canvas"></canvas>
 
-<img class="person-photo" id="personPhoto" src="img/photo/photo1.jpg" alt="Ta的照片" style="display:none;">
+<img class="person-photo" id="personPhoto" src="img/photo/photo2.png" alt="Ta的照片" style="display:none;">
 
 <div class="foto-wrapper">
   <img class="foto" src="img/hbd1.png" alt="生日快乐">
@@ -299,7 +299,7 @@
 
     if (photo.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
       isCandleBlownOut = true;
-      photo.src = "img/cake/cake_out.png";
+      photo.src = "img/cake/cake_out2.png";
       document.body.classList.remove('dark-bg');
       typeText.textContent = "";
       setTimeout(() => {
@@ -385,7 +385,7 @@
       newPhoto.addEventListener('click', () => {
         if (newPhoto.src.includes('cake_light.png') && isWishPromptShown && !isCandleBlownOut) {
           isCandleBlownOut = true;
-          newPhoto.src = "img/cake/cake_out.png";
+          newPhoto.src = "img/cake/cake_out2.png";
           document.body.classList.remove('dark-bg');
           typeText.textContent = "";
           setTimeout(() => {
